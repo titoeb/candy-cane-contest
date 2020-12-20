@@ -1,0 +1,4 @@
+kaggle-environments
+numpy
+scikit-learn
+requests

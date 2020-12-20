@@ -1,0 +1,10 @@
+version: '3'
+services:
+  env:
+    volumes:
+      - "./src:/usr/src:rw"
+    build:
+      context: ./src
+      dockerfile: dev.Dockerfile
+    ports:
+      - "5000:5000"

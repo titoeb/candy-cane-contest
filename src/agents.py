@@ -12,24 +12,23 @@ def cycle_agent(observation, configuration):
     return observation["step"] % configuration.banditCount
 
 
-# Create thomson-sampling:
-class ThomsonSamplingAgent:
-    """
-    I am using a class here to save the state of the agent.
-    """
-
-    def __init__(self, n_bins):
-        self.n_called = 0
-
-    def play(self, observation, configuration):
-        self.n_called += 1
-        return cycle_agent(observation, configuration)
-
-
 class EpsilonDecayingGreedyAgent:
     def __init__(
         self, n_bins: int, epsilon_start: float, ratio_decay: float, min_epsilon: float
     ):
+        self._nbins = n_bins
+        self._epsilon_start = epsilon_start
+        self._ratio_decay = ratio_decay
+        self._min_epsilon = min_epsilon
+
+        self.initiallize(
+            n_bins=self._nbins,
+            epsilon_start=self._epsilon_start,
+            ratio_decay=self._ratio_decay,
+            min_epsilon=self._min_epsilon,
+        )
+
+    def initiallize(self, n_bins, epsilon_start, ratio_decay, min_epsilon):
         self.epsilon_greedy_agent = EpsilonGreedyAgent(
             n_bins=n_bins, epsilon=epsilon_start
         )
@@ -39,6 +38,14 @@ class EpsilonDecayingGreedyAgent:
     def play(self, observation, configuration):
 
         action = self.epsilon_greedy_agent.play(observation, configuration)
+
+        if observation.step == 0:
+            self.initiallize(
+                n_bins=self._nbins,
+                epsilon_start=self._epsilon_start,
+                ratio_decay=self._ratio_decay,
+                min_epsilon=self._min_epsilon,
+            )
 
         # Update epsilon
         self.epsilon_greedy_agent.epsilon = max(
@@ -88,10 +95,20 @@ class ThomsonSampler:
 
 class EpsilonGreedyAgent:
     def __init__(self, n_bins: int, epsilon: float):
+        self._epsilon = epsilon
+        self._n_bins = n_bins
+        self.initiallize(n_bins=self._n_bins, epsilon=self._epsilon)
+
+    def initiallize(self, n_bins, epsilon):
         self.greedy_agent = GreedyAgent(n_bins=n_bins)
         self.epsilon = epsilon
 
     def play(self, observation, configuration):
+
+        # Reset agent if new game started
+        if observation.step == 0:
+            self.initiallize(n_bins=self._n_bins, epsilon=self._epsilon)
+
         greedy_action = self.greedy_agent.play(observation, configuration)
         if random.random() > self.epsilon:
             # print(f"Took greedy action {greedy_action}")
@@ -104,12 +121,18 @@ class EpsilonGreedyAgent:
 
 class GreedyAgent:
     def __init__(self, n_bins: int):
+        self._nbins = n_bins
+        self.initiallize(n_bins=n_bins)
+
+    def initiallize(self, n_bins):
         self.success = np.zeros(n_bins)
         self.failure = np.zeros(n_bins)
         self.reward = 0
 
     def play(self, observation, configuration):
 
+        if observation.step == 0:
+            self.initiallize(n_bins=self._nbins)
         # Update last action.
         if len(observation["lastActions"]) > 0:
             # If not any previous action stored, this is the first round

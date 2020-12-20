@@ -19,7 +19,7 @@ def main(n_rounds: int, n_processes: int):
     # greedy_agent = GreedyAgent(n_bins=100)
     # epsilon_greedy_agent = EpsilonGreedyAgent(n_bins=100, epsilon=0.5)
     epsilon_decaying_greedy_agent = EpsilonDecayingGreedyAgent(
-        n_bins=100, epsilon_start=1.0, ratio_decay=0.9995, min_epsilon=0.4
+        n_bins=100, epsilon_start=1.0, ratio_decay=0.99, min_epsilon=0.2
     )
 
     thomson = ThomsonSampler(n_bins=100)

@@ -1,4 +1,3 @@
-import random
 import numpy as np
 import random
 
@@ -63,6 +62,90 @@ class EpsilonDecayingGreedyAgent:
         return action
 
 
+class UpperConfidenceBoundDecay:
+    def __init__(self, c, n_bins):
+        self._c = c
+        self._n_bins = n_bins
+        self.initiallize(n_bins=n_bins, c=c)
+
+    def initiallize(self, n_bins, c):
+        self.c = c
+        self.n_bins = n_bins
+        self.success = np.zeros(n_bins)
+        self.failure = np.zeros(n_bins)
+        self.total_reward = 0
+
+    def play(self, observation, configuration):
+        my_index = observation.agentIndex
+        if observation.step == 0:
+            self.initiallize(n_bins=self._n_bins, c=self._c)
+        else:
+            # Update params
+            my_last_action = observation.lastActions[my_index]
+            reward = observation.reward - self.total_reward
+            self.total_reward = observation.reward
+            self.success[my_last_action] += reward
+            self.failure[my_last_action] += 1 - reward
+
+        # Choose action
+        # Compute ucb target function
+        success_ratio = np.round(
+            self.success / (self.success + self.failure + 1e-10), decimals=4
+        )
+
+        t = observation.step
+
+        target_function = np.round(
+            success_ratio
+            + self.c * np.sqrt(np.log(t + 1) / (self.success + self.failure + 1e-10)),
+            decimals=4,
+        )
+
+        return int(np.argmax(target_function))
+
+
+class UpperConfidenceBound:
+    def __init__(self, c, n_bins):
+        self._c = c
+        self._n_bins = n_bins
+        self.initiallize(n_bins=n_bins, c=c)
+
+    def initiallize(self, n_bins, c):
+        self.c = c
+        self.n_bins = n_bins
+        self.success = np.zeros(n_bins)
+        self.failure = np.zeros(n_bins)
+        self.total_reward = 0
+
+    def play(self, observation, configuration):
+        my_index = observation.agentIndex
+        if observation.step == 0:
+            self.initiallize(n_bins=self._n_bins, c=self._c)
+        else:
+            # Update params
+            my_last_action = observation.lastActions[my_index]
+            reward = observation.reward - self.total_reward
+            self.total_reward = observation.reward
+            self.success[my_last_action] += reward
+            self.failure[my_last_action] += 1 - reward
+
+        # Choose action
+        # Compute ucb target function
+        success_ratio = np.round(
+            self.success / (self.success + self.failure + 1e-10), decimals=4
+        )
+
+        t = observation.step
+
+        target_function = np.round(
+            success_ratio
+            + self.c * np.sqrt(np.log(t + 1) / (self.success + self.failure + 1e-10)),
+            decimals=4,
+        )
+
+        return int(np.argmax(target_function))
+
+
 class ThomsonSampler:
     def __init__(self, n_bins):
         self.initiallize(n_bins)
@@ -83,13 +166,10 @@ class ThomsonSampler:
             my_last_action = observation.lastActions[my_index]
             reward = observation.reward - self.total_reward
             self.total_reward = observation.reward
-            if reward != 0 and reward != 1:
-                print("hi1")
-
             self.posterior_a[my_last_action] += reward
             self.posterior_b[my_last_action] += 1 - reward
 
-        samples = np.random.beta(self.posterior_b, self.posterior_a)
+        samples = np.random.beta(a=self.posterior_a, b=self.posterior_b)
         return int(np.argmax(samples))
 
 
@@ -141,10 +221,9 @@ class GreedyAgent:
 
             # If the stored reword is not the reward in observation,
             # the last action was a success, otherwise a failure.
-            if self.reward != observation["reward"]:
-                self.success[last_action] += 1
-            else:
-                self.failure[last_action] += 1
+            reward = observation["reward"] - self.reward
+            self.success[last_action] += reward
+            self.failure[last_action] += 1 - reward
             self.reward = observation["reward"]
 
         # Compute new action

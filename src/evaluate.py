@@ -5,6 +5,7 @@ from agents import (
     EpsilonGreedyAgent,
     EpsilonDecayingGreedyAgent,
     ThomsonSampler,
+    UpperConfidenceBound,
 )
 import datetime
 from typing import List, Callable
@@ -17,20 +18,23 @@ from utils import simulate_mab
 def main(n_rounds: int, n_processes: int):
 
     # greedy_agent = GreedyAgent(n_bins=100)
-    # epsilon_greedy_agent = EpsilonGreedyAgent(n_bins=100, epsilon=0.5)
+    epsilon_greedy_agent = EpsilonGreedyAgent(n_bins=100, epsilon=0.6)
     epsilon_decaying_greedy_agent = EpsilonDecayingGreedyAgent(
-        n_bins=100, epsilon_start=1.0, ratio_decay=0.99, min_epsilon=0.2
+        n_bins=100, epsilon_start=0.9, ratio_decay=0.99, min_epsilon=0.6
     )
+
+    upper_confidence_bound = UpperConfidenceBound(n_bins=100, c=2)
 
     thomson = ThomsonSampler(n_bins=100)
 
     agents = [
-        random_agent,
+        # random_agent,
         # cycle_agent,
         # greedy_agent.play,
         # epsilon_greedy_agent.play,
-        epsilon_decaying_greedy_agent.play,
-        # thomson.play,
+        upper_confidence_bound.play,
+        # epsilon_decaying_greedy_agent.play,
+        thomson.play,
     ]
 
     print(
@@ -38,7 +42,6 @@ def main(n_rounds: int, n_processes: int):
     )
     start = datetime.datetime.now()
     rewards = simulate_mab(agents, n_rounds=n_rounds, n_processes=n_processes)
-    print(rewards)
     print(f"Execution took {datetime.datetime.now() - start}")
 
     print(

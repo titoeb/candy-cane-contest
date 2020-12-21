@@ -1,5 +1,3 @@
-#! pip install kaggle-environments --upgrade -q
-
 import numpy as np
 import random
 

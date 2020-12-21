@@ -4,27 +4,24 @@ from kaggle_environments import make, evaluate
 from copy import deepcopy
 
 
-def play_mab(agents: List[Callable]) -> List[int]:
+def play_mab(agents: List[str]) -> List[int]:
     """
     Play a round of multi-armed bandit with the specified agents. Return
     a list of the rewards of the different agents.
     """
-    agents_copied = [deepcopy(agent) for agent in agents]
 
     # Create environment
     env = make("mab", debug=True)
 
     # Run environment
-    steps = env.run(agents_copied)
+    steps = env.run(agents)
 
     # Compute rewards
     final_step = steps[-1]
     return [final_step[0].reward, final_step[1].reward]
 
 
-def simulate_mab(
-    agents: List[Callable], n_rounds: int, n_processes: int
-) -> List[List[int]]:
+def simulate_mab(agents: List[str], n_rounds: int, n_processes: int) -> List[List[int]]:
     """
     Play multiple rounds of mab and return the single outcomes.
     It returns a list of the following structure:

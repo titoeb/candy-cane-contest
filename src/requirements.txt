@@ -3,3 +3,5 @@ numpy
 scikit-learn
 requests
 typer
+pylint
+black

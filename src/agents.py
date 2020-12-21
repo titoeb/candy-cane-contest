@@ -62,48 +62,6 @@ class EpsilonDecayingGreedyAgent:
         return action
 
 
-class UpperConfidenceBoundDecay:
-    def __init__(self, c, n_bins):
-        self._c = c
-        self._n_bins = n_bins
-        self.initiallize(n_bins=n_bins, c=c)
-
-    def initiallize(self, n_bins, c):
-        self.c = c
-        self.n_bins = n_bins
-        self.success = np.zeros(n_bins)
-        self.failure = np.zeros(n_bins)
-        self.total_reward = 0
-
-    def play(self, observation, configuration):
-        my_index = observation.agentIndex
-        if observation.step == 0:
-            self.initiallize(n_bins=self._n_bins, c=self._c)
-        else:
-            # Update params
-            my_last_action = observation.lastActions[my_index]
-            reward = observation.reward - self.total_reward
-            self.total_reward = observation.reward
-            self.success[my_last_action] += reward
-            self.failure[my_last_action] += 1 - reward
-
-        # Choose action
-        # Compute ucb target function
-        success_ratio = np.round(
-            self.success / (self.success + self.failure + 1e-10), decimals=4
-        )
-
-        t = observation.step
-
-        target_function = np.round(
-            success_ratio
-            + self.c * np.sqrt(np.log(t + 1) / (self.success + self.failure + 1e-10)),
-            decimals=4,
-        )
-
-        return int(np.argmax(target_function))
-
-
 class UpperConfidenceBound:
     def __init__(self, c, n_bins):
         self._c = c
@@ -113,8 +71,8 @@ class UpperConfidenceBound:
     def initiallize(self, n_bins, c):
         self.c = c
         self.n_bins = n_bins
-        self.success = np.zeros(n_bins)
-        self.failure = np.zeros(n_bins)
+        self.n_used = np.full(n_bins, 1e-10)
+        self.rewards = np.full(n_bins, 1e-10)
         self.total_reward = 0
 
     def play(self, observation, configuration):
@@ -124,26 +82,49 @@ class UpperConfidenceBound:
         else:
             # Update params
             my_last_action = observation.lastActions[my_index]
+            self.n_used[my_last_action] += 1
             reward = observation.reward - self.total_reward
-            self.total_reward = observation.reward
-            self.success[my_last_action] += reward
-            self.failure[my_last_action] += 1 - reward
+            self.rewards[my_last_action] += reward
 
         # Choose action
         # Compute ucb target function
-        success_ratio = np.round(
-            self.success / (self.success + self.failure + 1e-10), decimals=4
-        )
-
+        success_ratio = np.round(self.rewards / self.n_used, 4)
         t = observation.step
+        exploration = np.round(self.c * np.sqrt(np.log(t + 1) / self.n_used), 4)
 
-        target_function = np.round(
-            success_ratio
-            + self.c * np.sqrt(np.log(t + 1) / (self.success + self.failure + 1e-10)),
-            decimals=4,
-        )
+        return int(np.argmax(success_ratio + exploration))
 
-        return int(np.argmax(target_function))
+
+class UpperConfidenceBoundDecay:
+    def __init__(self, c, n_bins):
+        self._c = c
+        self._n_bins = n_bins
+        self.initiallize(n_bins=n_bins, c=c)
+
+    def initiallize(self, n_bins, c):
+        self.c = c
+        self.n_bins = n_bins
+        self.n_used = np.full(n_bins, 1e-10)
+        self.rewards = np.full(n_bins, 1e-10)
+        self.total_reward = 0
+
+    def play(self, observation, configuration):
+        my_index = observation.agentIndex
+        if observation.step == 0:
+            self.initiallize(n_bins=self._n_bins, c=self._c)
+        else:
+            # Update params
+            my_last_action = observation.lastActions[my_index]
+            self.n_used[my_last_action] += 1
+            reward = observation.reward - self.total_reward
+            self.rewards[my_last_action] += reward
+        # Choose action
+        # Compute ucb target function
+        success_ratio = self.rewards / self.n_used
+        t = observation.step
+        exploration = self.c * np.sqrt(np.log(t + 1) / self.n_used)
+
+        return int(np.argmax(success_ratio + exploration))
 
 
 class ThomsonSampler:

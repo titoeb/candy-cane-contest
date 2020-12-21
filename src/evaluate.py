@@ -23,7 +23,7 @@ def main(n_rounds: int, n_processes: int):
         n_bins=100, epsilon_start=0.9, ratio_decay=0.99, min_epsilon=0.6
     )
 
-    upper_confidence_bound = UpperConfidenceBound(n_bins=100, c=2)
+    upper_confidence_bound = UpperConfidenceBound(n_bins=100, c=0.45)
 
     thomson = ThomsonSampler(n_bins=100)
 

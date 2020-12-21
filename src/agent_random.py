@@ -2,12 +2,8 @@ import numpy as np
 import random
 
 
-def random_agent(observation, configuration):
-    return random.randrange(configuration.banditCount)
-
-
 def agent(observation, configuration):
-    return random_agent
+    return random.randrange(configuration.banditCount)
 
 
 # if __name__ == "__main__":

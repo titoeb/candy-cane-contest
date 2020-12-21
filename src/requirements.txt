@@ -5,3 +5,5 @@ requests
 typer
 pylint
 black
+scipy
+pandas

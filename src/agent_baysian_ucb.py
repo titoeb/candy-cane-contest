@@ -2,51 +2,51 @@
 
 import numpy as np
 import random
+from scipy.stats import beta
 
 
-class UpperConfidenceBoundDecay:
-    def __init__(self, c, n_bins, decay=0.97):
+class BaysianUpperConfidenceBound:
+    def __init__(self, c, n_bins):
         self._c = c
         self._n_bins = n_bins
-        self._decay = decay
-        self.initiallize(n_bins=n_bins, c=c, decay=decay)
+        self.initiallize(n_bins=n_bins, c=c)
 
-    def initiallize(self, n_bins, c, decay):
+    def initiallize(self, n_bins, c):
         self.c = c
         self.n_bins = n_bins
-        self.n_used = np.full(n_bins, 1e-10)
-        self.rewards = np.full(n_bins, 1e-10)
+        self.posterior_a = np.ones(n_bins)
+        self.posterior_b = np.ones(n_bins)
         self.total_reward = 0
-        self.decay = decay
 
     def play(self, observation, configuration):
         my_index = observation.agentIndex
         if observation.step == 0:
-            self.initiallize(n_bins=self._n_bins, c=self._c, decay=self._decay)
+            self.initiallize(n_bins=self._n_bins, c=self._c)
         else:
             # Extract info from observation.
             my_last_action = observation.lastActions[my_index]
             reward = observation.reward - self.total_reward
 
             # Extract params
-            self.rewards[my_last_action] += self.decay * reward
-            self.n_used[my_last_action] += 1
+            self.posterior_a[my_last_action] += reward
+            self.posterior_b[my_last_action] += 1 - reward
             self.total_reward = observation.reward
 
         # Choose action
         # Compute ucb target function
-        success_ratio = self.rewards / self.n_used
-        t = observation.step
-        exploration = self.c * np.sqrt(np.log(t + 1) / self.n_used)
+        upper_bound = (
+            self.posterior_a / (self.posterior_a + self.posterior_b)
+            + beta.std(self.posterior_a, self.posterior_b) * self.c
+        )
 
-        return int(np.argmax(success_ratio + exploration))
+        return int(np.argmax(upper_bound))
 
 
-upper_confidence_bound_decay = UpperConfidenceBoundDecay(n_bins=100, c=1.0)
+baysian_upper_confidence_bound = BaysianUpperConfidenceBound(n_bins=100, c=2.75)
 
 
 def agent(observation, configuration):
-    return upper_confidence_bound_decay.play(observation, configuration)
+    return baysian_upper_confidence_bound.play(observation, configuration)
 
 
 # if __name__ == "__main__":

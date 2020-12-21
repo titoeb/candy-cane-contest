@@ -150,3 +150,5 @@ cython_debug/
 .history/
 
 
+# Specific file
+src/tmp.py

@@ -48,7 +48,7 @@ class VegasSlotMachine:
             return int(np.argmax(target_function))
 
 
-vegas_slot_machine = VegasSlotMachine(n_bins=100, c=0.25)
+vegas_slot_machine = VegasSlotMachine(n_bins=100, c=0.9999999999999999)
 
 
 def agent(observation, configuration):

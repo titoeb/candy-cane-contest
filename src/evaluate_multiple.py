@@ -12,7 +12,7 @@ with open(
 ) as file_handler:
     agent_code = file_handler.read()
 
-for value_to_replace in np.linspace(0.1, 3, num=30):
+for value_to_replace in np.linspace(1.6, 3, num=30):
     code = agent_code.replace("c=0.25", f"c={value_to_replace}")
     with open("tmp.py", "w") as file_handler:
         file_handler.write(code)

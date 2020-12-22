@@ -1,0 +1,9 @@
+kaggle-environments
+numpy
+scikit-learn
+requests
+typer
+pylint
+black
+scipy
+pandas

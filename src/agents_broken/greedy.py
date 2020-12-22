@@ -16,6 +16,7 @@ class GreedyAgent:
 
         if observation.step == 0:
             self.initiallize(n_bins=self._nbins)
+
         # Update last action.
         if len(observation["lastActions"]) > 0:
             # If not any previous action stored, this is the first round

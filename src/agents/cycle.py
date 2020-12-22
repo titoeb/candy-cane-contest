@@ -2,12 +2,8 @@ import numpy as np
 import random
 
 
-def cycle_agent(observation, configuration):
-    return observation["step"] % configuration.banditCount
-
-
 def agent(observation, configuration):
-    return cycle_agent
+    return observation["step"] % configuration.banditCount
 
 
 # if __name__ == "__main__":

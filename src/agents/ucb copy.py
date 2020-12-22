@@ -37,16 +37,7 @@ class UpperConfidenceBound:
         t = observation.step
         exploration = self.c * np.sqrt(np.log(t + 1) / self.n_used)
 
-        target_function = success_ratio + exploration
-
-        optimal_action = np.argmax(target_function)
-
-        action_is_optimal_mask = target_function == target_function[optimal_action]
-        if action_is_optimal_mask.sum() > 1:
-            # Sample a random one from the optimal actions
-            return int(np.random.choice(np.where(action_is_optimal_mask)[0]))
-
-        return int(optimal_action)
+        return int(np.argmax(success_ratio + exploration))
 
 
 upper_confidence_bound = UpperConfidenceBound(n_bins=100, c=0.45)

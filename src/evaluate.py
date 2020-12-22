@@ -22,9 +22,15 @@ def main(
     base_path: str,
 ):
     # Load all agents
+    if not agent_to_evaluate.endswith(".py"):
+        agent_to_evaluate = agent_to_evaluate + ".py"
+
+    # Load all agents.
     all_agents = list(Path(base_path).absolute().iterdir())
     agent_path = [
-        agent_path for agent_path in all_agents if agent_to_evaluate in agent_path.name
+        agent_path
+        for agent_path in all_agents
+        if agent_path.name.startswith(agent_to_evaluate)
     ]
 
     opponent_pool_paths = [

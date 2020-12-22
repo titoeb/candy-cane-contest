@@ -1,6 +1,7 @@
 # Generic Python .gitignore taken from https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 # Byte-compiled / optimized / DLL files
-__pycache__/
+___pycache__
+src/_pycache__/
 *.py[cod]
 *$py.class
 

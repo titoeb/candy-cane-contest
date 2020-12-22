@@ -152,3 +152,4 @@ cython_debug/
 
 # Specific file
 src/tmp.py
+src/.vscode/*

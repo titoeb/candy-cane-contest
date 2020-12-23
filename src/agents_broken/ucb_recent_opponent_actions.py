@@ -73,7 +73,7 @@ class UpperConfidenceBound:
             / self.damping_factor
         )
 
-        factor = np.ones(self.n_bins)
+        factors = np.ones(self.n_bins)
         factors[list(recent_actions)] *= values
 
         return int(np.argmax(target_function * factors))

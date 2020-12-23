@@ -48,7 +48,7 @@ class UpperConfidenceBoundDecay:
         return int(np.argmax(success_ratio + exploration))
 
 
-upper_confidence_bound_decay = UpperConfidenceBoundDecay(n_bins=100, c=0.45)
+upper_confidence_bound_decay = UpperConfidenceBoundDecay(n_bins=100, c=0.18)
 
 
 def agent(observation, configuration):

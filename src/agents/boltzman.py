@@ -4,48 +4,42 @@ import numpy as np
 import random
 
 
-class BaseAgent:
-    def __init__(self):
-        self.mu = None
-        self.win = None
-        self.loss = None
-        self.id = None
-        self.tot_reward = 0
+class Boltzman:
+    def __init__(self, n_bins, invT):
+        self._n_bins = n_bins
+        self._invT = invT
+        self.initiallize(n_bins=n_bins, invT=invT)
 
-    def set_pars(self, obs, conf):
-        self.n_bandits = conf.banditCount
-        self.win = np.ones(self.n_bandits)
-        self.loss = np.ones(self.n_bandits)
-        self.id = obs.agentIndex
-
-    def pull(self, obs, config):
-        """random elf"""
-        return int(np.random.choice(config.banditCount))
-
-
-class Boltzman(BaseAgent):
-    def __init__(self, invT):
-        super(Boltzman, self).__init__()
+    def initiallize(self, n_bins, invT):
+        self.n_bins = n_bins
         self.invT = invT
 
-    def play(self, obs, conf):
-        """boltzmann elf"""
-        if obs.step == 0:
-            self.set_pars(obs, conf)
+        self.total_reward = 0
+        self.success = np.ones(n_bins)
+        self.failure = np.zeros(n_bins)
+
+    def play(self, observation, configuration):
+        my_index = observation.agentIndex
+        if observation.step == 0:
+            self.initiallize(n_bins=self._n_bins, invT=self.invT)
+            return int(np.random.randint(0, self.n_bins))
         else:
-            r = obs.reward - self.tot_reward
-            self.tot_reward = obs.reward
+            # Extract info from observation.
+            my_last_action = observation.lastActions[my_index]
+            reward = observation.reward - self.total_reward
 
-            self.win[obs["lastActions"][self.id]] += r
-            self.loss[obs["lastActions"][self.id]] += 1 - r
+            # Extract params
+            self.total_reward = observation.reward
+            self.success[my_last_action] += reward
+            self.failure[my_last_action] += 1 - reward
 
-        mu = self.win / (self.win + self.loss)
-        w = np.exp(self.invT * mu)
+            # Choose action
+            success_ratio = self.success / (self.success + self.failure)
+            weight = np.exp(self.invT * success_ratio)
+            return int(np.random.choice(self.n_bins, 1, p=list(weight / weight.sum())))
 
-        return int(np.random.choice(self.n_bandits, 1, p=list(w / w.sum())))
 
-
-boltzman = Boltzman(invT=10)
+boltzman = Boltzman(n_bins=100, invT=10)
 
 
 def agent(observation, configuration):

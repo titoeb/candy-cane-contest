@@ -49,7 +49,7 @@ class UpperConfidenceBound:
         return int(optimal_action)
 
 
-upper_confidence_bound = UpperConfidenceBound(n_bins=100, c=0.45)
+upper_confidence_bound = UpperConfidenceBound(n_bins=100, c=1.0)
 
 
 def agent(observation, configuration):

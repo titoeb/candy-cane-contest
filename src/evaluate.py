@@ -52,25 +52,40 @@ def main(
         f"The candidate agent will be tested for {n_rounds_per_agent} rounds against each agent. \nThe process parallelized on {n_processes} processes."
     )
 
+    prints, _ = evaluate_against_opponents(
+        agent_path, opponent_pool_paths, n_rounds_per_agent, n_processes
+    )
+    print(prints)
+
+
+def evaluate_against_opponents(
+    candidate_path: Path,
+    opponents_paths: List[Path],
+    n_rounds_per_agent: int,
+    n_processes: int,
+) -> str:
+
+    output_strings = []
+
     start = datetime.datetime.now()
     all_simulations = {
         opponent_path.name: simulate_mab(
-            [agent_path.as_posix(), opponent_path.as_posix()],
+            [candidate_path.as_posix(), opponent_path.as_posix()],
             n_rounds_per_agent,
             n_processes,
         )
-        for opponent_path in opponent_pool_paths
+        for opponent_path in opponents_paths
     }
 
-    print(
+    output_strings.append(
         f"The totals simulation took {datetime.datetime.now() - start}.\n{print_sep()}"
     )
 
     average_reward_agent = get_agent_final_rewards(0, all_simulations).mean()
     win_ratio_agent = get_agent_wins(0, all_simulations).mean()
 
-    print(
-        f"Agent: {agent_path.name}, total average_reward: {average_reward_agent}, total win ratio: {win_ratio_agent}\n{print_sep()}\n"
+    output_strings.append(
+        f"Agent: {candidate_path.name}, total average_reward: {average_reward_agent}, total win ratio: {win_ratio_agent}\n{print_sep()}\n"
     )
 
     summary = get_summary_matches(0, all_simulations)
@@ -90,27 +105,21 @@ def main(
         sorted(summary_wins.items(), key=lambda x: -x[1][1][0])
     )
 
-    print(f"Agent {agent_path.name} has lost against:\n{print_sep()}\n")
+    output_strings.append(
+        f"Agent {candidate_path.name} has lost against:\n{print_sep()}\n"
+    )
     for agent, summary in summary_losses_sorted.items():
-        print(f"Agent: {agent}\n{summary}\n")
+        output_strings.append(f"Agent: {agent}\n{summary}\n")
 
-    print(f"Agent {agent_path.name} has won against:\n{print_sep()}\n")
+    output_strings.append(
+        f"Agent {candidate_path.name} has won against:\n{print_sep()}\n"
+    )
     for agent, summary in summary_wins_sorted.items():
-        print(f"Agent: {agent}\n{summary}\n")
+        output_strings.append(f"Agent: {agent}\n{summary}\n")
 
-    print("Execution done.")
+    output_strings.append("Execution done.")
 
-    # print("Agent \t\t Average Reward \t\t Standard deviation of reward")
-    # print("-" * 100)
-    # print(
-    #     "\n".join(
-    #         [
-    #             f"{agent} \t\t {round(np.array(rewards).mean(), 3)} \t\t {round(np.std(np.array(rewards)), 3)}"
-    #             for agent, rewards in zip(AGENTS, rewards)
-    #         ]
-    #     )
-    # )
-    # print("-" * 100)
+    return "\n".join(output_strings), all_simulations
 
 
 if __name__ == "__main__":

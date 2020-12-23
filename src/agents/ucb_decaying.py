@@ -26,10 +26,16 @@ class UpperConfidenceBoundDecay:
         else:
             # Extract info from observation.
             my_last_action = observation.lastActions[my_index]
+            opponent_last_action = observation.lastActions[1 - my_index]
             reward = observation.reward - self.total_reward
 
             # Extract params
-            self.rewards[my_last_action] += self.decay * reward
+            self.rewards[my_last_action] += reward
+
+            # Decay rewards of taken action
+            self.rewards[opponent_last_action] *= self.decay
+            self.rewards[my_last_action] *= self.decay
+
             self.n_used[my_last_action] += 1
             self.total_reward = observation.reward
 
@@ -42,7 +48,7 @@ class UpperConfidenceBoundDecay:
         return int(np.argmax(success_ratio + exploration))
 
 
-upper_confidence_bound_decay = UpperConfidenceBoundDecay(n_bins=100, c=1.0)
+upper_confidence_bound_decay = UpperConfidenceBoundDecay(n_bins=100, c=0.45)
 
 
 def agent(observation, configuration):

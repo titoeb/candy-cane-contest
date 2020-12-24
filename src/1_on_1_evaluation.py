@@ -22,11 +22,21 @@ def main(
 
     agent_path = [
         agent_path for agent_path in all_agents if agent_path.name.startswith(candidate)
-    ].pop()
+    ]
     opponent_path = [
         agent_path for agent_path in all_agents if agent_path.name.startswith(opponent)
     ]
+    if len(agent_path) == 0:
+        raise ValueError(
+            f"Candidate agent {candidate} could not be found in {base_path}"
+        )
+    else:
+        agent_path = agent_path.pop()
 
+    if len(opponent_path) == 0:
+        raise ValueError(
+            f"Candidate agent {opponent} could not be found in {base_path}"
+        )
     print(print_sep())
     print(
         f"The agent {agent_path.name} will be tested against the following agent: {opponent_path[0].name}\n"

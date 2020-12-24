@@ -64,9 +64,8 @@ class UpperConfidenceBound:
         values = (
             1
             + np.log(
-                1
-                + [
-                    self.opponent_action_buffer.count(recent_action)
+                [
+                    1 + self.opponent_action_buffer.count(recent_action)
                     for recent_action in recent_actions
                 ]
             )

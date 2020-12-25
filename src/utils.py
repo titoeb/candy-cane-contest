@@ -88,3 +88,16 @@ def get_summary_matches(agent_idx: int, performances: Dict[str, List]) -> Dict:
             agent_0_has_won,
         ]
     return summary
+
+    def create_replace_file(old_file: str, new_file: str, params: Dict):
+        # Load old file
+        with open(old_file) as file_handler:
+            code = file_handler.read()
+        
+        position = code.index("# PARAMS-END #")
+
+        # Only take everyhing after the "# PARAMS-END #"
+
+        # ADD the params dict in only upper case in the begginning of the file.
+
+        # Write out the file.

@@ -1,13 +1,11 @@
 #! pip install kaggle-environments --upgrade -q
-
-# PARAMS #
 EXPLORATION = 0.45
 SAMPLING = True
 DECAYING = 0.97
 BUFFER_LENTH = 100
 DAMPING_FACTOR = 4
 MIN_STEP_OPPONENT = 500
-# PARAMS #
+# PARAMS-END #
 
 import numpy as np
 import random

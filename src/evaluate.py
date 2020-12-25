@@ -63,7 +63,7 @@ def evaluate_against_opponents(
     opponents_paths: List[Path],
     n_rounds_per_agent: int,
     n_processes: int,
-) -> str:
+) -> Tuple[str, Dict]
 
     output_strings = []
 

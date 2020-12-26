@@ -89,15 +89,21 @@ def get_summary_matches(agent_idx: int, performances: Dict[str, List]) -> Dict:
         ]
     return summary
 
-    def create_replace_file(old_file: str, new_file: str, params: Dict):
-        # Load old file
-        with open(old_file) as file_handler:
-            code = file_handler.read()
-        
-        position = code.index("# PARAMS-END #")
 
-        # Only take everyhing after the "# PARAMS-END #"
+def create_replace_file(old_file: str, new_file: str, params: Dict):
+    # Load old file
+    with open(old_file) as file_handler:
+        while not "# PARAMS-END #" in file_handler.readline():
+            continue
+        code = "".join(file_handler.readlines())
 
-        # ADD the params dict in only upper case in the begginning of the file.
+    # ADD the params dict in only upper case in the begginning of the file.
+    hyper_params = []
+    for param_name, value in params.items():
+        hyper_params.append(f"{param_name.upper()} = {value}")
 
-        # Write out the file.
+    # Write out the file.
+    code_output = "\n".join(hyper_params) + "\n" + code
+
+    with open(new_file, "w") as file_handler:
+        file_handler.write(code_output)

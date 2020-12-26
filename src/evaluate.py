@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Callable
+from typing import List, Callable, Tuple, Dict
 import numpy as np
 import datetime
 import typer
@@ -63,7 +63,7 @@ def evaluate_against_opponents(
     opponents_paths: List[Path],
     n_rounds_per_agent: int,
     n_processes: int,
-) -> Tuple[str, Dict]
+) -> Tuple[str, Dict]:
 
     output_strings = []
 

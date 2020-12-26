@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 
-class ThomsonSampler:
+class ThompsonSampler:
     def __init__(self, n_bins):
         self.initiallize(n_bins)
 
@@ -29,7 +29,7 @@ class ThomsonSampler:
         return int(np.argmax(samples))
 
 
-thompson_sampler = ThomsonSampler(n_bins=100)
+thompson_sampler = ThompsonSampler(n_bins=100)
 
 
 def agent(observation, configuration):

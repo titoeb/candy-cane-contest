@@ -1,3 +1,8 @@
+model = r"""
+
+"""
+
+
 import numpy as np
 import random
 import pickle
@@ -69,7 +74,7 @@ class Greedy_ML:
         )
 
 
-greedy_ml = Greedy_ML(n_bins=100, ...)
+greedy_ml = Greedy_ML(n_bins=100, consider_outcomes=0.99, model_str=model)
 
 
 def agent(observation, configuration):

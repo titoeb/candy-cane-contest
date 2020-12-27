@@ -156,3 +156,7 @@ src/.vscode/*
 
 # Ignore all tracked optuna runs.
 src/optuna/*
+
+# Ignore both binary data and binary model files
+src/data/*
+src/model/*

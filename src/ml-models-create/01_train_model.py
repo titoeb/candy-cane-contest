@@ -25,5 +25,7 @@ model.fit(data[TRAIN_FEATS], data[TARGET_COL])
 # file
 model_string = encode_base64_string(model)
 
+final_string = f"model = {model_string}"
+
 with open(MODEL_FILE, "w") as file_handler:
-    file_handler.write(f'model = r"{model_string}"')
+    file_handler.write(final_string)

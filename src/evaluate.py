@@ -12,6 +12,7 @@ from utils import (
 )
 from pathlib import Path
 import collections
+from tqdm import tqdm
 
 
 def main(
@@ -75,7 +76,7 @@ def evaluate_against_opponents(
             n_rounds_per_agent,
             n_processes,
         )
-        for opponent_path in opponents_paths
+        for opponent_path in tqdm(opponents_paths)
     }
 
     output_strings.append(

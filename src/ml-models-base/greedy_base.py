@@ -26,37 +26,44 @@ class Greedy_ML:
         self.predictions = self.model.predict(np.full((self.n_bins, 4), 0.0))
 
     def play(self, observation, configuration):
-        my_index = observation.agentIndex
-        # Extract info from observation.
-        my_last_action = observation.lastActions[my_index]
-        opponent_last_action = observation.lastActions[1 - my_index]
-        reward = observation.reward - self.total_reward
+        current_step = observation.step
+        if current_step > 0:
+            my_index = observation.agentIndex
+            # Extract info from observation.
+            my_last_action = observation.lastActions[my_index]
+            opponent_last_action = observation.lastActions[1 - my_index]
+            reward = observation.reward - self.total_reward
+            self.total_reward = observation.reward
 
-        # Extract params
-        self.n_pulls[my_index] += 1
-        self.n_pulls_opponent[opponent_last_action] += 1
-        self.success[my_index] += reward
+            # Extract params
+            self.n_pulls[my_last_action] += 1
+            self.n_pulls_opponent[opponent_last_action] += 1
+            self.success[my_last_action] += reward
 
-        # Update predictions for chosen machines.
-        # Update predictions for machine pulled by itself
-        self.predictions[my_last_action] = self.model.predict(
-            [
-                self.n_pulls_opponent.sum(),
-                self.n_pulls[my_last_action],
-                self.success[my_last_action],
-                self.n_pulls_opponent[my_last_action],
-            ]
-        )
+            # Update predictions for chosen machines.
+            # Update predictions for machine pulled by itself
+            self.predictions[my_last_action] = self.model.predict(
+                np.array(
+                    [
+                        current_step,
+                        self.n_pulls[my_last_action],
+                        self.success[my_last_action],
+                        self.n_pulls_opponent[my_last_action],
+                    ]
+                ).reshape(1, -1)
+            )
 
-        # Update predictions for machine opponent pulled.
-        self.predictions[opponent_last_action] = self.model.predict(
-            [
-                self.n_pulls_opponent.sum(),
-                self.n_pulls[opponent_last_action],
-                self.success[opponent_last_action],
-                self.n_pulls_opponent[opponent_last_action],
-            ]
-        )
+            # Update predictions for machine opponent pulled.
+            self.predictions[opponent_last_action] = self.model.predict(
+                np.array(
+                    [
+                        current_step,
+                        self.n_pulls[opponent_last_action],
+                        self.success[opponent_last_action],
+                        self.n_pulls_opponent[opponent_last_action],
+                    ]
+                ).reshape(1, -1)
+            )
 
         # Sample action from all actions that are within
         # self.consider_outcomes * maximum outcome

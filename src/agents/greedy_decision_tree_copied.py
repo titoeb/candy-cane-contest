@@ -98,7 +98,7 @@ class GreedyStrategy:
 
 
 def agent(observation, configuration):
-    global curr_agent
+    global agent
 
     if observation.step == 0:
         # Initialize agent

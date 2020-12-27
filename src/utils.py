@@ -76,11 +76,16 @@ def get_summary_matches(agent_idx: int, performances: Dict[str, List]) -> Dict:
 
     summary = {}
     for opponent, match in performances.items():
-        rewards_agent_0 = get_rewards_match(0, match)
-        rewards_agent_1 = get_rewards_match(1, match)
-        wins_agent_0 = get_wins_match(0, match)
-        wins_agent_1 = get_wins_match(1, match)
-        agent_0_has_won = wins_agent_0.sum() > wins_agent_1.sum()
+        try:
+            rewards_agent_0 = get_rewards_match(0, match)
+            rewards_agent_1 = get_rewards_match(1, match)
+            wins_agent_0 = get_wins_match(0, match)
+            wins_agent_1 = get_wins_match(1, match)
+            agent_0_has_won = wins_agent_0.sum() > wins_agent_1.sum()
+        except Exception as e:
+            raise ValueError(
+                f"An error occured when creating the summary for opponent {opponent}. Error was: {e}"
+            )
 
         summary[opponent] = [
             [rewards_agent_0.mean(), rewards_agent_1.mean()],

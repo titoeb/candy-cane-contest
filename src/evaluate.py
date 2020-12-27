@@ -31,6 +31,7 @@ def main(
         agent_path
         for agent_path in all_agents
         if agent_path.name.startswith(agent_to_evaluate)
+        and not agent_path.name == "__pycache__"
     ]
 
     opponent_pool_paths = [

@@ -1,7 +1,6 @@
 import datetime
 from typing import List, Callable, Tuple, Dict
 import numpy as np
-import datetime
 import typer
 from utils import (
     simulate_mab,
@@ -14,6 +13,7 @@ from utils import (
 from pathlib import Path
 import collections
 from tqdm import tqdm
+import pickle
 
 
 def main(
@@ -55,10 +55,17 @@ def main(
         f"The candidate agent will be tested for {n_rounds_per_agent} rounds against each agent. \nThe process parallelized on {n_processes} processes."
     )
 
-    prints, _ = evaluate_against_opponents(
+    prints, results = evaluate_against_opponents(
         agent_path, opponent_pool_paths, n_rounds_per_agent, n_processes
     )
     print(prints)
+
+    # Store results in data
+    file_name  = f'data/results_{datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")}.pickle'
+    with open( file_name, "wb") as file_handler:
+        pickle.dump(results, file_handler)
+
+    print(f"Store results to {file_name}")
 
 
 def evaluate_against_opponents(

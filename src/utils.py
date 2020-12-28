@@ -3,6 +3,7 @@ import multiprocessing as mp
 from kaggle_environments import make, evaluate
 from typing import List, Dict
 import numpy as np
+from tqdm import tqdm
 
 
 def play_mab(agents: List[str]) -> List[int]:
@@ -112,3 +113,10 @@ def create_replace_file(old_file: str, new_file: str, params: Dict):
 
     with open(new_file, "w") as file_handler:
         file_handler.write(code_output)
+
+
+def my_tqdm(elements, step_size):
+    progress_bar = tqdm(total=len(elements) * step_size)
+    for num, elem in enumerate(elements):
+        yield elem
+        progress_bar.update((1 + num) * step_size)

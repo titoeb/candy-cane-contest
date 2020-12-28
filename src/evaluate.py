@@ -9,6 +9,7 @@ from utils import (
     get_agent_final_rewards,
     get_agent_wins,
     get_summary_matches,
+    my_tqdm,
 )
 from pathlib import Path
 import collections
@@ -76,7 +77,7 @@ def evaluate_against_opponents(
             n_rounds_per_agent,
             n_processes,
         )
-        for opponent_path in tqdm(opponents_paths)
+        for opponent_path in my_tqdm(opponents_paths, step_size=n_rounds_per_agent)
     }
 
     output_strings.append(

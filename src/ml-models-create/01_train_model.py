@@ -9,16 +9,16 @@ def encode_base64_string(model: Any) -> str:
     return base64.b64encode(pickle.dumps(model))
 
 
-# DATA_FILE = "data/data_2020-12-29--08-31-32.parquet"
-DATA_FILE = "data/data_initial.parquet"
+DATA_FILE = "data/data_2020-12-29--13-43-00.parquet"
+# DATA_FILE = "data/data_initial.parquet"
 MODEL_FILE = "/usr/src/models/decision_tree.txt"
 # TRAIN_FEATS = ["round", "n_pulls_self", "n_success_self", "n_pulls_opponent"]
 # TARGET_COL = "success_probs"
 
 TRAIN_FEATS = ["round_num", "n_pulls_self", "n_success_self", "n_pulls_opp"]
-# TARGET_COL = "payout"
+TARGET_COL = "payout"
 
-TARGET_COL = "sucess_probs"
+# TARGET_COL = "sucess_probs"
 
 
 # Load data

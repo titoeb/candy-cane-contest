@@ -119,5 +119,5 @@ def my_tqdm(elements, step_size):
     progress_bar = tqdm(total=len(elements) * step_size)
     for num, elem in enumerate(elements):
         yield elem
-        progress_bar.update((1 + num) * step_size)
+        progress_bar.update((1 + num) * step_size - progress_bar.n)
     progress_bar.close()

@@ -5,7 +5,7 @@ from typing import Dict, List
 import datetime
 
 
-RESULT_DIR = "/usr/src/data/results_2020-12-28--14-18-54.pickle"
+RESULT_DIR = "/usr/src/data/results_2020-12-29--13-36-29.pickle"
 
 
 def create_training_data(
@@ -16,7 +16,7 @@ def create_training_data(
     n_bins = len(result[0][0]["observation"]["thresholds"])
 
     # Create raw dataset.
-    initial = np.full((n_bins + 2 * (len(result) - 1), 5), 0.0)
+    initial = np.full((n_bins + 4 * (len(result) - 1), 5), 0.0)
     data = pd.DataFrame(
         data=initial,
         columns=[
@@ -29,8 +29,8 @@ def create_training_data(
     )
 
     # Pre insert round and agent
-    data["round"] = [0] * n_bins + sorted(list(range(1, len(result))) * 2)
-    data["agent_id"] = [-1] * n_bins + [0, 1] * (len(result) - 1)
+    data["round"] = [0] * n_bins + sorted(list(range(1, len(result))) * 4)
+    data["agent_id"] = [-1] * n_bins + [0, 1, 0, 1] * (len(result) - 1)
 
     # Set initial rewards
     data.loc[:99, "success_probs"] = [
@@ -81,10 +81,11 @@ def create_training_data(
             agent_1_state["n_success_self"][agent_1_action] += agent_1_current_reward
             agent_1_state["n_pulls_opponent"][agent_0_action] += 1
 
-            # Insert one datapoint for each agent
-            idx_agent_0 = n_bins + (current_step - 1) * 2
+            # Add 2 datapoints for each agents
+            # Action agent 0 from perspective of agent 0
+            row = n_bins + (current_step - 1) * 4
             data.loc[
-                idx_agent_0,
+                row,
                 [
                     "n_pulls_self",
                     "n_success_self",
@@ -94,14 +95,29 @@ def create_training_data(
             ] = [
                 agent_0_state["n_pulls_self"][agent_0_action],
                 agent_0_state["n_success_self"][agent_0_action],
-                agent_0_state["n_pulls_opponent"][agent_1_action],
+                agent_0_state["n_pulls_opponent"][agent_0_action],
                 success_ratios[agent_0_action],
             ]
 
-            # Insert one datapoint for each agent
-            idx_agent_1 = n_bins + (current_step - 1) * 2 + 1
+            # Action agent 0 from perspective of agent 1
             data.loc[
-                idx_agent_1,
+                row + 1,
+                [
+                    "n_pulls_self",
+                    "n_success_self",
+                    "n_pulls_opponent",
+                    "success_probs",
+                ],
+            ] = [
+                agent_1_state["n_pulls_self"][agent_0_action],
+                agent_1_state["n_success_self"][agent_0_action],
+                agent_1_state["n_pulls_opponent"][agent_0_action],
+                success_ratios[agent_0_action],
+            ]
+
+            # Action agent 1 from agent 1 perspective
+            data.loc[
+                row + 2,
                 [
                     "n_pulls_self",
                     "n_success_self",
@@ -111,7 +127,23 @@ def create_training_data(
             ] = [
                 agent_1_state["n_pulls_self"][agent_1_action],
                 agent_1_state["n_success_self"][agent_1_action],
-                agent_1_state["n_pulls_opponent"][agent_0_action],
+                agent_1_state["n_pulls_opponent"][agent_1_action],
+                success_ratios[agent_1_action],
+            ]
+
+            # Action agent 1 from agent 0 perspective
+            data.loc[
+                row + 3,
+                [
+                    "n_pulls_self",
+                    "n_success_self",
+                    "n_pulls_opponent",
+                    "success_probs",
+                ],
+            ] = [
+                agent_0_state["n_pulls_self"][agent_1_action],
+                agent_0_state["n_success_self"][agent_1_action],
+                agent_0_state["n_pulls_opponent"][agent_1_action],
                 success_ratios[agent_1_action],
             ]
 
@@ -273,7 +305,12 @@ if __name__ == "__main__":
 
     df = pd.concat(
         [
-            log_training(result=results[0], n_machines=100)
+            pd.concat(
+                [
+                    log_training(result=this_round, n_machines=100)
+                    for this_round in results
+                ]
+            )
             for results in results.values()
         ]
     )

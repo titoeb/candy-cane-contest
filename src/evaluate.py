@@ -22,6 +22,7 @@ def main(
     n_processes: int,
     #    base_path: str = "agents/",
     base_path: str,
+    store_results: bool = False,
 ):
     # Load all agents
     if not agent_to_evaluate.endswith(".py"):
@@ -60,12 +61,13 @@ def main(
     )
     print(prints)
 
-    # Store results in data
-    file_name  = f'data/results_{datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")}.pickle'
-    with open( file_name, "wb") as file_handler:
-        pickle.dump(results, file_handler)
+    if store_results is True:
+        # Store results in data
+        file_name = f'data/results_{datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")}.pickle'
+        with open(file_name, "wb") as file_handler:
+            pickle.dump(results, file_handler)
 
-    print(f"Store results to {file_name}")
+        print(f"Store results to {file_name}")
 
 
 def evaluate_against_opponents(

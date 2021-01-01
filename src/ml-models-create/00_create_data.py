@@ -55,6 +55,11 @@ def create_training_data(
     for round_agent_0, round_agent_1 in result:
         current_step = round_agent_0["observation"]["step"]
         if current_step > 0:
+            # Update rewards
+            success_ratios = [
+                threshold / 100 for threshold in round_agent_0["observation"]["thresholds"]
+            ]
+
             # Update agents
             agent_0_action = round_agent_0["observation"]["lastActions"][
                 round_agent_0["observation"]["agentIndex"]
@@ -129,11 +134,6 @@ def create_training_data(
                 agent_1_action
             ]
             data.at[row + 3, "success_probs"] = success_ratios[agent_1_action]
-
-        # Update rewards
-        success_ratios = [
-            threshold / 100 for threshold in round_agent_0["observation"]["thresholds"]
-        ]
 
     return data
 

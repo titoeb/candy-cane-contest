@@ -22,9 +22,8 @@ def main(
     opponents: List[str],
     n_rounds_per_agent: int,
     n_processes: int,
-    #    base_path: str = "agents/",
     base_path: str,
-    store_results: bool = True,
+    store_results: bool,
 ):
     # Load all agents
     if not agent_to_evaluate.endswith(".py"):

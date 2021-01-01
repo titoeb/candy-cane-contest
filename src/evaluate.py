@@ -22,7 +22,7 @@ def main(
     n_processes: int,
     #    base_path: str = "agents/",
     base_path: str,
-    store_results: bool = False,
+    store_results: bool,
 ):
     # Load all agents
     if not agent_to_evaluate.endswith(".py"):

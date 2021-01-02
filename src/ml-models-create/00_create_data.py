@@ -5,7 +5,7 @@ from typing import Dict, List
 import datetime
 from tqdm import tqdm
 
-RESULT_DIR = "data/results_2021-01-02--07-34-53.pickle"
+RESULT_DIR = "data/results_2021-01-02--17-24-25.pickle"
 
 
 def create_training_data(

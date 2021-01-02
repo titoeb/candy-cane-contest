@@ -5,7 +5,7 @@ from typing import Dict, List
 import datetime
 from tqdm import tqdm
 
-RESULT_DIR = "/usr/src/data/results_2020-12-29--13-36-29.pickle"
+RESULT_DIR = "data/results_2021-01-02--07-34-53.pickle"
 
 
 def create_training_data(
@@ -57,7 +57,8 @@ def create_training_data(
         if current_step > 0:
             # Update rewards
             success_ratios = [
-                threshold / 100 for threshold in round_agent_0["observation"]["thresholds"]
+                threshold / 100
+                for threshold in round_agent_0["observation"]["thresholds"]
             ]
 
             # Update agents

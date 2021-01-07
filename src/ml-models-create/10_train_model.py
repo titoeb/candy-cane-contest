@@ -38,22 +38,19 @@ def optimize_decision_tree(trial, X, y):
     return np.square(test_preds - y_test).mean()
 
 
-DATA_FILE = "data/data_2021-01-02--22-06-28.parquet"
+DATA_FILE = "data/data_initial.parquet"
 
 # DATA_FILE = "data/data_initial.parquet"
 MODEL_FILE = "/usr/src/models/decision_tree.txt"
-TRAIN_FEATS = ["round", "n_pulls_self", "n_success_self", "n_pulls_opponent"]
-TARGET_COL = "success_probs"
-N_TRIALS = 75
+# TRAIN_FEATS = ["round", "n_pulls_self", "n_success_self", "n_pulls_opponent"]
+# TARGET_COL = "success_probs"
+N_TRIALS = 50
 RANDOM_STATE = 1993
-PERCENTAGE_TEST = 0.01
+PERCENTAGE_TEST = 0.7
 
 
-# TRAIN_FEATS = ["round_num", "n_pulls_self", "n_success_self", "n_pulls_opp"]
-# TARGET_COL = "payout"
-
-# TARGET_COL = "sucess_probs"
-
+TRAIN_FEATS = ["round_num", "n_pulls_self", "n_success_self", "n_pulls_opp"]
+TARGET_COL = "payout"
 
 # Load data
 data = pd.read_parquet(DATA_FILE)

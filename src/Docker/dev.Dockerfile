@@ -1,5 +1,7 @@
 FROM python:3.8-slim
 
+RUN apt update && apt upgrade && apt-get install libgomp1
+
 COPY requirements.txt ./ 
 
 WORKDIR /usr/src

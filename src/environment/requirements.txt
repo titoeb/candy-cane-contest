@@ -9,3 +9,4 @@ scipy
 pandas
 optuna
 pyarrow
+lightgbm

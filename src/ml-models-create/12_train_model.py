@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 from sklearn.model_selection import train_test_split
 import lightgbm as lgb
+import optuna.integration.lightgbm as lgb_opt
 
 
 def encode_base64_string(model: Any) -> str:
@@ -35,25 +36,35 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, random_state=RANDOM_STATE, test_size=PERCENTAGE_TEST
 )
 
-gbm = lgb.LGBMRegressor(objective="regression", n_estimators=100)
-gbm.fit(
-    X_train,
-    y_train,
-    eval_set=[(X_test, y_test)],
-    eval_metric="l1",
-    early_stopping_rounds=5,
+dtrain = lgb_opt.Dataset(X_train, label=y_train)
+dval = lgb_opt.Dataset(X_test, label=y_test)
+
+params = {
+    "objective": "regression",
+    "metric": "mse",
+    "verbosity": -1,
+}
+
+model = lgb_opt.train(
+    params,
+    dtrain,
+    valid_sets=[dtrain, dval],
+    verbose_eval=5,
+    early_stopping_rounds=100,
 )
 
+
+best_params = model.params
 # Test model on test data
-test_preds = gbm.predict(X_test)
+test_preds = model.predict(X_test)
 
 mse = np.square(test_preds - y_test).mean()
 
 print(f"MSE: {mse}")
 
 # Train final model on all data with correct number of estimators:
-model = lgb.LGBMRegressor(objective="regression", n_estimators=gbm.best_iteration_)
-model.fit(
+final_model = lgb.LGBMRegressor(**best_params)
+final_model.fit(
     X,
     y,
 )
@@ -61,7 +72,7 @@ model.fit(
 
 # Store model as base64 string that will be prependet to agents
 # file
-model_string = encode_base64_string(model)
+model_string = encode_base64_string(final_model)
 
 final_string = f"model = {model_string}"
 

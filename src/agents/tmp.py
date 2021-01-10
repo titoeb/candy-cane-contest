@@ -1,7 +1,5 @@
-#! pip install kaggle-environments --upgrade -q
-C = 0.9999999999999999
-RANDOM_TRESHOLD = 0.5
-# PARAMS-END #
+RANDOM_TRESHOLD = 3.63482751867761
+C = 0.014870133675403019
 
 import numpy as np
 import random
